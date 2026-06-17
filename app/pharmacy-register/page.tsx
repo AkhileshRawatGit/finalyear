@@ -90,8 +90,8 @@ export default function PharmacyRegisterPage() {
       // Update NextAuth session to reflect the new userType (pharmacy)
       await update({ userType: "pharmacy" });
 
-      router.push("/pharmacy-dashboard")
-      router.refresh()
+      // Use window.location.href to force a full reload and update context immediately
+      window.location.href = "/pharmacy-dashboard"
     } catch (err: any) {
       setError(err.message)
     } finally {

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
@@ -13,12 +13,19 @@ import { useAuth } from "@/contexts/AuthContext"
 
 export default function PharmacyLoginPage() {
   const router = useRouter()
-  // const { login } = useAuth() // No longer directly used
+  const { user, loading } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Redirect if already logged in as pharmacy/admin
+  useEffect(() => {
+    if (!loading && user && (user.userType === "pharmacy" || user.userType === "admin")) {
+      router.push("/pharmacy-dashboard")
+    }
+  }, [user, loading, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,7 +58,8 @@ export default function PharmacyLoginPage() {
         throw new Error("Access denied. Pharmacy account required.")
       }
 
-      router.push("/pharmacy-dashboard")
+      // Use window.location.href to force a full reload and update NextAuth context immediately
+      window.location.href = "/pharmacy-dashboard"
     } catch (err: any) {
       setError(err.message || "Failed to log in")
     } finally {

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
@@ -13,12 +13,23 @@ import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginPage() {
   const router = useRouter()
-  // const { login } = useAuth() // No longer needed directly from here
+  const { user, loading } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      if (user.userType === "pharmacy" || user.userType === "admin") {
+        router.push("/pharmacy-dashboard")
+      } else {
+        router.push("/")
+      }
+    }
+  }, [user, loading, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,7 +52,8 @@ export default function LoginPage() {
         throw new Error(res.error)
       }
 
-      router.push("/") // NextAuth automatically updates the session
+      // Use window.location.href to reload the page and update session immediately
+      window.location.href = "/"
     } catch (err: any) {
       setError(err.message || "Failed to log in")
     } finally {
