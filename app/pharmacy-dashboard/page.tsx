@@ -103,9 +103,15 @@ export default function PharmacyDashboard() {
   // Fetch pharmacy data and orders when authenticated
   useEffect(() => {
     // This check is now redundant due to the guard above, but kept for type safety within this effect
-    if (!user) return
+    if (!user) {
+      console.log("PharmacyDashboard: No user found in session yet.");
+      return;
+    }
+
+    console.log("PharmacyDashboard: User found in session:", { email: user.email, userType: user.userType });
 
     if (user.userType !== "pharmacy" && user.userType !== "admin") {
+      console.log("PharmacyDashboard: User is not pharmacy or admin! Redirecting to '/'");
       router.push("/")
       return
     }
@@ -208,7 +214,9 @@ export default function PharmacyDashboard() {
 
   // Auth guard and redirect
   useEffect(() => {
+    console.log("PharmacyDashboard Auth Guard check:", { authLoading, hasUser: !!user });
     if (!authLoading && !user) {
+      console.log("PharmacyDashboard: No session user found and loading finished. Redirecting to '/'");
       router.push('/')
     }
   }, [user, authLoading, router])

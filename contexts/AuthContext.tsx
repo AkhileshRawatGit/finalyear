@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     avatar: session.user.image || '',
   } as User : null;
 
+  console.log("AuthContext Debug: status =", status, "user =", user);
+
   const login = (userData: User) => {
     if (userData.userType === 'pharmacy' || userData.userType === 'admin') {
       router.push('/pharmacy-dashboard')
